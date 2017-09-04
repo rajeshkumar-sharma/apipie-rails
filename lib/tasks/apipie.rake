@@ -16,9 +16,11 @@ namespace :apipie do
   #    | - resource2.html
   #
   # By default OUT="#{Rails.root}/doc/apidoc"
-  task :static, [:version] => :environment do |t, args|
+  task :static, [:scope, :version] => :environment do |t, args|
     with_loaded_documentation do
       args.with_defaults(:version => Apipie.configuration.default_version)
+      scope = nil;
+      scope = args[:scope].present? ? args[:scope].to_sym : args[:scope];
       out = ENV["OUT"] || File.join(::Rails.root, Apipie.configuration.doc_path, 'apidoc')
       subdir = File.basename(out)
       copy_jscss(out)
@@ -26,7 +28,7 @@ namespace :apipie do
       ([nil] + Apipie.configuration.languages).each do |lang|
         I18n.locale = lang || Apipie.configuration.default_locale
         Apipie.url_prefix = "./#{subdir}"
-        doc = Apipie.to_json(args[:version], nil, nil, lang)
+        doc = Apipie.to_json(args[:version], nil, nil, lang, scope)
         doc[:docs][:link_extension] = "#{lang_ext(lang)}.html"
         generate_one_page(out, doc, lang)
         generate_plain_page(out, doc, lang)

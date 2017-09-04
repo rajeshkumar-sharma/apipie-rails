@@ -17,17 +17,14 @@ module Apipie
       :_headers
 
     def initialize(controller, resource_name, dsl_data = nil, version = nil, &block)
-
       @_methods = ActiveSupport::OrderedHash.new
       @_params_args = []
       @_errors_args = []
-
       @controller = controller
       @_id = resource_name
       @_version = version || Apipie.configuration.default_version
       @_name = @_id.humanize
       @_parent = Apipie.get_resource_description(controller.superclass, version)
-
       update_from_dsl_data(dsl_data) if dsl_data
     end
 
@@ -42,7 +39,6 @@ module Apipie
       @_metadata = dsl_data[:meta]
       @_api_base_url = dsl_data[:api_base_url]
       @_headers = dsl_data[:headers]
-
       if dsl_data[:app_info]
         Apipie.configuration.app_info[_version] = dsl_data[:app_info]
       end
@@ -88,15 +84,20 @@ module Apipie
       @_methods.keys.map(&:to_s).include?(method_name.to_s)
     end
 
-    def to_json(method_name = nil, lang = nil)
+    def has_methods_for_scope? (scope=nil)
+      methods_in_scope = @_methods.select{ |key, method| method.has_apis_for_scope?(scope)}
+      return !methods_in_scope.empty?
+    end
+
+    def to_json(method_name = nil, lang = nil, scope = nil)
       if method_name && !valid_method_name?(method_name)
         raise "Method #{method_name} not found for resource #{_name}"
       end
 
       methods = if method_name.blank?
-        @_methods.collect { |key, method_description| method_description.to_json(lang) }
+        @_methods.select{|key, method| (method.has_apis_for_scope?(scope))}.collect { |key, method_description| method_description.to_json(lang, scope) }
       else
-        [@_methods[method_name.to_sym].to_json(lang)]
+        [@_methods[method_name.to_sym].to_json(lang, scope)]
       end
 
       {

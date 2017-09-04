@@ -9,6 +9,7 @@ module Apipie
         @descriptions = Hash.new do |h, k|
           h[k] = {:params => {}, :errors => Set.new}
         end
+        puts @api_controllers_paths
         @records = Hash.new { |h,k| h[k] = [] }
       end
 
@@ -110,4 +111,3 @@ module Apipie
     end
   end
 end
-

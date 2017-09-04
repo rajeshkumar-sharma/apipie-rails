@@ -73,6 +73,7 @@ module Apipie
       return if ignored?(controller, method_name)
       ret_method_description = nil
 
+
       versions = dsl_data[:api_versions] || []
       versions = controller_versions(controller) if versions.empty?
 
@@ -252,22 +253,20 @@ module Apipie
     def reload_examples
       @recorded_examples = nil
     end
-
-    def to_json(version, resource_name, method_name, lang)
+    def to_json(version, resource_name, method_name, lang, scope = nil)
 
       return unless valid_search_args?(version, resource_name, method_name)
-
       _resources = if resource_name.blank?
         # take just resources which have some methods because
         # we dont want to show eg ApplicationController as resource
-        resource_descriptions[version].inject({}) do |result, (k,v)|
-          result[k] = v.to_json(nil, lang) unless v._methods.blank?
+        resource_descriptions[version].select{|key, resource| resource.has_methods_for_scope?(scope)}
+        .inject({}) do |result, (k,v)|
+          result[k] = v.to_json(nil, lang, scope) unless v._methods.blank?
           result
         end
       else
         [@resource_descriptions[version][resource_name].to_json(method_name, lang)]
       end
-
       url_args = Apipie.configuration.version_in_url ? version : ''
 
       {

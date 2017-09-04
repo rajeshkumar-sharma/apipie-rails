@@ -123,8 +123,8 @@ module Apipie
       return path
     end
 
-    def method_apis_to_json(lang = nil)
-      @apis.each.collect do |api|
+    def method_apis_to_json(lang = nil, scope)
+      @apis.select{|api| api.options[:scope] === scope}.each.collect do |api|
         {
           :api_url => create_api_url(api),
           :http_method => api.http_method.to_s,
@@ -142,11 +142,11 @@ module Apipie
       @formats || @resource._formats
     end
 
-    def to_json(lang=nil)
+    def to_json(lang=nil, scope=nil)
       {
         :doc_url => doc_url,
         :name => @method,
-        :apis => method_apis_to_json(lang),
+        :apis => method_apis_to_json(lang, scope),
         :formats => formats,
         :full_description => Apipie.app.translate(@full_description, lang),
         :errors => errors.map(&:to_json),
@@ -157,6 +157,12 @@ module Apipie
         :headers => headers,
         :show => @show
       }
+    end
+
+    def has_apis_for_scope?(scope = nil)
+      return true if !scope.present?
+      apiScopes = @apis.map(&:options).collect{|option| option[:scope]}
+      return apiScopes.include? scope
     end
 
     # was the description defines in a module instead of directly in controller?

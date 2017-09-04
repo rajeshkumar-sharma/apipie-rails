@@ -8,9 +8,9 @@ module Apipie
     @application ||= Apipie::Application.new
   end
 
-  def self.to_json(version = nil, resource_name = nil, method_name = nil, lang = nil)
+  def self.to_json(version = nil, resource_name = nil, method_name = nil, lang = nil, scope = nil)
     version ||= Apipie.configuration.default_version
-    app.to_json(version, resource_name, method_name, lang)
+    app.to_json(version, resource_name, method_name, lang, scope)
   end
 
   # all calls delegated to Apipie::Application instance
