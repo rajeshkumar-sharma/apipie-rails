@@ -265,7 +265,7 @@ module Apipie
           result
         end
       else
-        [@resource_descriptions[version][resource_name].to_json(method_name, lang)]
+        [@resource_descriptions[version][resource_name].to_json(method_name, lang, scope)]
       end
       url_args = Apipie.configuration.version_in_url ? version : ''
 

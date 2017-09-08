@@ -151,6 +151,47 @@ module Apipie
         "Must match regular expression <code>/#{@regexp.source}/</code>."
       end
     end
+    # validate arguments value with DateTime
+    class DateTimeValidator < BaseValidator
+
+      def initialize(param_description, argument)
+        super(param_description)
+        @regexp = argument
+      end
+
+      def validate(value)
+        value.is_a? DateTime
+      end
+
+      def self.build(param_description, argument, options, proc)
+        self.new(param_description, argument) if argument == DateTime
+      end
+
+      def description
+        "Must be a DateTime, eg: <code>13/10/2017 12:10:54</code>"
+      end
+    end
+
+    # validate arguments value with DateTime
+    class DateTimeValidator < BaseValidator
+
+      def initialize(param_description, argument)
+        super(param_description)
+        @regexp = argument
+      end
+
+      def validate(value)
+        value.is_a? Date
+      end
+
+      def self.build(param_description, argument, options, proc)
+        self.new(param_description, argument) if argument == Date
+      end
+
+      def description
+        "Must be a Date, eg: <code>13/10/2017</code>"
+      end
+    end
 
     # arguments value must be one of given in array
     class EnumValidator < BaseValidator
